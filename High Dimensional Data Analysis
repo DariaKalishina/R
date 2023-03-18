@@ -1,0 +1,171 @@
+install.packages("devtools")
+library(devtools)
+install_github("genomicsclass/tissuesGeneExpression")
+
+library(tissuesGeneExpression)
+data(tissuesGeneExpression)
+head(e)
+head(tissue)
+
+table(tissue)
+
+x <- e[,3]
+y <- e[,45]
+sqrt(sum((x-y)^2))
+
+j <- e['210486_at',]
+k <- e['200805_at',]
+
+sqrt(crossprod(j-k))
+?dist()
+d = dist(t(e))
+class(d)
+
+as.matrix(d)[210486,200805]
+
+install.packages("Bioconuctor")
+install.packages(biocL)
+library(Biobase)
+library(GSE5859Subset)
+data(GSE5859Subset)
+
+
+library(tissuesGeneExpression)
+data(tissuesGeneExpression)
+
+s = svd(e)
+signflips = sample(c(-1,1),ncol(e),replace=TRUE)
+signflips
+
+newu= sweep(s$u,2,signflips,FUN="*")
+newv= sweep(s$v,2,signflips,FUN="*" )
+all.equal( s$u %*% diag(s$d) %*% t(s$v), newu %*% diag(s$d) %*% t(newv))
+
+s = svd(e)
+m = rowMeans(e)
+cor(s$u[,1],m)
+
+newmeans = rnorm(nrow(e)) ##random values we will add to create new means
+newe = e+newmeans ##we change the means
+sqrt(crossprod(e[,3]-e[,45]))
+sqrt(crossprod(newe[,3]-newe[,45]))
+
+y = e - rowMeans(e)
+s = svd(y)
+
+resid = y - s$u %*% diag(s$d) %*% t(s$v)
+max(abs(resid))
+
+x=matrix(rep(c(1,2),each=5),5,2)
+x
+x*c(1:5)
+
+sweep(x,1,1:5,"*")
+
+diag(s$d)%*%t(s$v)
+
+y = e - rowMeans(e)
+s = svd(y)
+z = s$d * t(s$v)
+
+install.packages("rafalib")
+library(rafalib)
+ftissue = factor(tissue)
+mypar(1,1)
+plot(z[1,],z[2,],col=as.numeric(ftissue))
+legend("topleft",levels(ftissue),col=seq_along(ftissue),pch=1)
+
+d = dist(t(e))
+mds = cmdscale(d)
+
+cor(z[2,], mds[,2])
+library(rafalib)
+ftissue = factor(tissue)
+mypar(1,2)
+plot(z[1,],z[2,],col=as.numeric(ftissue))
+legend("topleft",levels(ftissue),col=seq_along(ftissue),pch=1)
+plot(mds[,1],mds[,2],col=as.numeric(ftissue))
+
+library(GSE5859Subset)
+data(GSE5859Subset)
+dim(geneExpression)
+
+
+
+
+RNGkind()
+
+set.seed(1)
+m = 10000
+n = 24
+x = matrix(rnorm(m*n),m,n)
+colnames(x)=1:n
+hc <- hclust(d)
+plot(hc,labels=tissue,cex=0.5)
+
+
+library(devtools)
+install_github("genomicsclass/dagdata")
+#did not do this - got data directly from genomicsclass/dagdata repo
+install.packages("dagdata")
+library(dagdata)
+data(admissions)
+
+print( admissions )
+
+index = which(admissions$Gender==0)
+accepted = sum(admissions$Number[index] * admissions$Percent[index]/100)
+applied = sum(admissions$Number[index])
+accepted/applied
+
+
+atab<-as.data.frame(matrix(0,2,2))
+rownames(atab)<-c("Men","Women")
+colnames(atab)<-c("Accepted","Rejected")
+index = admissions$Gender==1
+men=admissions[index,]
+women=admissions[!index,]
+atab[1,1]= sum(men$Number * men$Percent/100)
+atab[1,2]= sum(men$Number*(1-men$Percent/100))
+windex = which(admissions$Gender==0)
+atab[2,1]= sum(women$Number * women$Percent/100)
+atab[2,2]= sum(women$Number * (1-women$Percent/100))
+atab
+chisq.test(atab)$p.value
+
+
+major = admissions[1:6,1]
+men = admissions[1:6,]
+women =admissions[7:12,]
+H = (men$Number*men$Percent/100 + women$Number*women$Percent/100) / (men$Number+women$Number)
+H
+major[which.min(H)]
+min(H)
+
+cor(H,men$Number)
+cor(men$Number,H)
+
+cor(H,women$Number)
+
+install_bioc("Biobase")
+install_github("genomicsclass/GSE5859")
+library(tissuesGeneExpression)
+library(GSE5859) 
+data(GSE5859)
+
+geneExpression = exprs(e) 
+sampleInfo = pData(e)
+
+year = format(sampleInfo$date,"%y")
+
+table(year,sampleInfo$ethnicity)
+
+set.seed(3)
+index = which((sampleinfoyear$year=="02" & sampleinfoyear$ethnicity== "ASN") & (sampleinfoyear$year == "05" & sampleinfoyear$ethnicity = "CEU"))
+ethnicity = factor(sampleinfoyear$ethnicity)[index]
+ethnicity = droplevels(ethnicity== "HAN")
+pvals<- rowttests(geneExpression[,index],ethnicity)$p.value
+qvals<-qvalue(pvals)$qvalue
+index <- which(qvals <0.05)
+result <- res$p.value[index]
+length(result)
