@@ -1,0 +1,127 @@
+
+
+#read the dataset
+dataset <- read.csv("dataset_online_calculator_customers.csv")
+View(dataset)
+
+#set text variables as a categorical type
+dataset$customer_type <- as.factor(dataset$customer_type)
+summary(dataset)
+
+#Hierarchical clustering
+data_hclust <- dataset[ ,2:5]
+library(cluster)
+
+#compute inter-observational distances using the cluster variable
+distances <- daisy(data_hclust) #takes care of categorical type data
+distance_matrix <- as.matrix(distances)
+
+#segment using hierarchical clustering techiques
+seg_hclust <- hclust(distances, method = "complete")
+
+#plot the complete hierarchy of agglomeration
+plot(seg_hclust)
+plot(seg_hclust, labels = FALSE)
+
+# 3-cluster solution
+seg_hclust_3 <- cutree(seg_hclust, k = 3)
+table(seg_hclust_3)
+
+plot(seg_hclust, labels = FALSE)
+rect.hclust(seg_hclust, k = 3, border = "blue")
+dataset$hclust_3 <- seg_hclust_3
+
+
+#summarize the individual segments
+summary(dataset[which(dataset$hclust_3 == 1), 1:5])
+summary(dataset[which(dataset$hclust_3 == 2), 1:5])
+summary(dataset[which(dataset$hclust_3 == 3), 1:5])
+
+#create a 4-cluster solution
+
+seg_hclust_4 <- cutree(seg_hclust, k = 4)
+table(seg_hclust_4)
+
+plot(seg_hclust, labels = FALSE)
+rect.hclust(seg_hclust, k = 4, border = "blue")
+dataset$hclust_4 <- seg_hclust_4
+
+
+#summarize the individual segments
+summary(dataset[which(dataset$hclust_4 == 1), 1:5])
+summary(dataset[which(dataset$hclust_4 == 2), 1:5])
+summary(dataset[which(dataset$hclust_4 == 3), 1:5])
+summary(dataset[which(dataset$hclust_4 == 4), 1:5])
+
+# 5-cluster solution
+seg_hclust_5 <- cutree(seg_hclust, k = 5)
+table(seg_hclust_5)
+
+plot(seg_hclust, labels = FALSE)
+rect.hclust(seg_hclust, k = 5, border = "blue")
+dataset$hclust_5 <- seg_hclust_5
+
+
+#summarize the individual segments
+summary(dataset[which(dataset$hclust_5 == 1), 1:5])
+summary(dataset[which(dataset$hclust_5 == 2), 1:5])
+summary(dataset[which(dataset$hclust_5 == 3), 1:5])
+summary(dataset[which(dataset$hclust_5 == 4), 1:5])
+summary(dataset[which(dataset$hclust_5 == 5), 1:5])
+
+#create a candidate cluster solution for k=3
+set.seed(1000)
+seg_kmeans_3 <- kmeans(data_kmeans, centers = 3)
+dataset$kmeans_3 <- seg_kmeans_3$cluster
+
+#describe 3 cluster solution 
+table(dataset$kmeans_3)
+
+#summarize individual segments in a 3-cluster solution
+summary(dataset[which(dataset$kmeans_3 == 1), 1:5])
+summary(dataset[which(dataset$kmeans_3 == 2), 1:5])
+summary(dataset[which(dataset$kmeans_3 == 3), 1:5])
+
+#create a candidate cluster solution for k=4
+set.seed(1000)
+seg_kmeans_4 <- kmeans(data_kmeans, centers = 4)
+dataset$kmeans_4 <- seg_kmeans_4$cluster
+
+#describe 4 cluster solution 
+table(dataset$kmeans_4)
+
+#summarize individual segments in a 4-cluster solution
+summary(dataset[which(dataset$kmeans_4 == 1), 1:5])
+summary(dataset[which(dataset$kmeans_4 == 2), 1:5])
+summary(dataset[which(dataset$kmeans_4 == 3), 1:5])
+summary(dataset[which(dataset$kmeans_4 == 4), 1:5])
+
+
+#create a candidate cluster solution for k=5
+set.seed(1000)
+seg_kmeans_5 <- kmeans(data_kmeans, centers = 5)
+dataset$kmeans_5 <- seg_kmeans_5$cluster
+
+#describe 5 cluster solution 
+table(dataset$kmeans_5)
+
+#summarize individual segments in a 5-cluster solution
+summary(dataset[which(dataset$kmeans_5 == 1), 1:5])
+summary(dataset[which(dataset$kmeans_5 == 2), 1:5])
+summary(dataset[which(dataset$kmeans_5 == 3), 1:5])
+summary(dataset[which(dataset$kmeans_5 == 4), 1:5])
+summary(dataset[which(dataset$kmeans_5 == 5), 1:5])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
