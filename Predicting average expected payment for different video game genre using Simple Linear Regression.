@@ -1,0 +1,71 @@
+#@author - Daria Kalishina
+
+
+dataset <- read.csv("dataset_videogame_payments.csv")
+View(dataset)
+summary(dataset)
+table(dataset$genre)
+sd(dataset$payment)
+
+library(psych)
+
+describe(dataset$payment)
+
+#correlations between voluntary payments, developer ratings, 
+#and the number of unique users who have streamed 
+#the videogame
+
+cor(dataset[ ,c(2,3,4)])
+
+#function of the video game genre
+
+dataset$genre_simulation_i <- 0
+dataset$genre_simulation_i[which(dataset$genre == "simulation")] <- 1
+
+dataset$genre_action_i <- 0
+dataset$genre_action_i[which(dataset$genre == "action")] <- 1
+
+
+linear_model_1 <- lm(payment ~ genre_action_i
+                     + genre_simulation_i,
+                     data = dataset)
+summary(linear_model_1)
+
+#function of developer ratings and previous number of unique users 
+#streaming the videogame
+linear_model_2 <- lm(payment ~ dev_rating
+                     + num_streams,
+                     data = dataset)
+summary(linear_model_2)
+
+#function of videogame genre, developer ratings, 
+#and previous number of unique users streaming of the videogame
+linear_model_3 <- lm(payment ~ genre_action_i
+                     + genre_simulation_i 
+                     + dev_rating
+                     + num_streams,
+                     data = dataset)
+summary(linear_model_3)
+
+#function of videogame genre, developer ratings, 
+#and previous number of unique users streaming the video game, 
+#and the payment appeal type
+dataset$appeal_charity_i <- ifelse (dataset$appeal_type == 'charity', 1, 0)
+
+linear_model_4 <- lm(payment ~ genre_action_i
+                     + genre_simulation_i 
+                     + dev_rating
+                     + num_streams
+                     + appeal_charity_i,
+                     data = dataset)
+summary(linear_model_4)
+
+#creating a dataframe for a developer
+
+developer <- data.frame(genre_action_i = 0,
+                        genre_simulation_i = 1,
+                        dev_rating = 4.5,
+                        num_streams = 1000,
+                        appeal_charity_i = 1)
+
+predict(linear_model_4, developer)
