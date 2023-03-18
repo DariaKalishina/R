@@ -1,0 +1,90 @@
+#read the dataset
+dataset <- read.csv("exercise.csv")
+View(dataset)
+
+dataset$BMI <- dataset$Height/dataset$Weight
+
+
+dataset_project <- dataset[ , c(2:3, 6:7, 9)]
+View(dataset_project)
+
+
+summary(dataset_project)
+table(dataset_project$Gender)
+hist(dataset_project$Heart_Rate, 50)
+sd(dataset_project$Heart_Rate)
+
+library(psych)
+describe(dataset_project$Heart_Rate)
+
+library(corrplot) 
+library(nFactors) 
+
+#correlation between continuous variables
+cor(dataset_project[ , c(2:5)])
+corrplot(cor(dataset_project[ , c(2:5)]))
+
+#creating indicators for gender type
+dataset_project$gender_female_i <- 0
+dataset_project$gender_female_i[which(dataset_project$Gender == "female")] <- 1
+
+
+#estimate linear model where avg. Heart Rate is a function of a gender, age, 
+# and BMI
+
+linear_model_1 <- lm(Heart_Rate ~ gender_female_i
+                     + Age
+                     + BMI,
+                     data = dataset_project)
+summary(linear_model_1)
+
+#estimate linear model where avg. Heart Rate is a function of a duration, Age, 
+# and BMI
+
+linear_model_2 <- lm(Heart_Rate ~ Duration
+                     + Age
+                     + BMI,
+                     data = dataset_project)
+summary(linear_model_2)
+
+#estimate linear model where avg. Heart Rate is a function of a gender,
+# age, BMI and duration of the exercise
+linear_model_3 <- lm(Heart_Rate ~ gender_female_i
+                     + Age
+                     + BMI
+                     + Duration,
+                     data = dataset_project)
+summary(linear_model_3)
+
+#predict avg. Heart Rate with Age - 23yo, BMI - 2.8, 
+#Duration - 30 providing the female gender.  
+
+new_customer <- data.frame(gender_female_i = 1,
+                           Age = 23,
+                           BMI = 2.8,
+                           Duration = 30,
+                           data = dataset_project)
+
+predict(linear_model_3, new_customer)
+
+#predict avg. Heart Rate with Age - 44yo, BMI - 2.1, 
+#Duration - 20 providing the male gender. 
+
+new_customer_2 <- data.frame(gender_female_i = 0,
+                             Age = 44,
+                             BMI = 2.1,
+                             Duration = 20,
+                             data = dataset_project)
+
+predict(linear_model_3, new_customer_2)
+
+#predict avg. Heart Rate with Age - 64yo, BMI - 1.9, 
+#Duration - 15 providing the female gender. 
+
+new_customer_3 <- data.frame(gender_female_i = 1,
+                             Age = 64,
+                             BMI = 1.9,
+                             Duration = 15,
+                             data = dataset_project)
+
+predict(linear_model_3, new_customer_3)
